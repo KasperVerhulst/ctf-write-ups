@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{enumitem,amssymb}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+
+
+
+\title{CTF header}
+\author{Kasper Verhulst}
+\date{February 2021}
+
+\begin{document}
+
+\begin{table}[h]
+\def\arraystretch{1.8}
+\begin{tabular}{|llll|}
+\hline
+\multicolumn{4}{|c|}{\Large \textbf{BabyTimeCapsule}}                                                                                         \\ \hline
+
+\multicolumn{2}{|p{0.4\textwidth}|}{Organization: HackTheBox}     &    \multicolumn{2}{|l|}{Type: online challenge}    \\ \hline
+\multicolumn{3}{|l|}{
+    \begin{minipage} [t] {0.07\textwidth} 
+Categories:
+    \end{minipage} 
+    \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}
+        \begin{todolist}
+            \item Network Security
+            \item[\done] Cryptography
+            \item Mobile Applications
+        \end{todolist}
+     \end{itemize} 
+    \end{minipage} 
+     \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}
+         \begin{todolist}
+            \item Reverse Engineering
+            \item Web Applications
+            \item Forensics
+         \end{todolist}
+        \end{itemize} 
+    \end{minipage} 
+    } & \multicolumn{1}{|l|}{Difficulty: Easy} \\ \hline
+     \multicolumn{2}{|l|}{Name: Kasper Verhulst} & \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}r@{}}Release date: 16-07-2022\\ Completing date: 26-12-2022\end{tabular}} \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Understanding the challange}
+The challenges involves the encryption of the flag with a textbook RSA implementation. An encryption server will listen on a TCP connection. We can establish a TCP conncetion using netcat:
+
+\vspace{3mm}
+
+\begin{lstlisting}
+nc localhost 1337 \\
+Welcome to Qubit Enterprises. Would you like your own time capsule? (Y/n) Y \\
+\{"time\_capsule": "75FD896DAC110FF4E5B78892EDC7FC7967DDA71E9DF283382D081AD16A1ED239BAE927E693A52D0BF835266942D8749B583E45AFA8300B74658EF6609ED9895642D1D6365917CDAABE539DDF564D5CBADBC17A8D", "pubkey": ["5350F28DD6B164EB7DD56EABBA123CC13A6ADA93C4BC61861E9E29653AEC438786A0C8624790194DB649FB910F69C9C193526B0D24ADB27350CD75101505E0C0B897E958CA09021F5713A0EC3BF6E591202AE75A5052FA658EB658AB2FBB7EEC928763BC593276388D5082066A4D60207268E2AA00D9470CC15F81A11D103031", "5"]\} \\
+Welcome to Qubit Enterprises. Would you like your own time capsule? (Y/n) Y \\
+\{"time\_capsule": "75FD896DAC110FF4E5B78892EDC7FC7967DDA71E9DF283382D081AD16A1ED239BAE927E693A52D0BF835266942D8749B583E45AFA8300B74658EF6609ED9895642D1D6365917CDAABE539DDF564D5CBADBC17A8D", "pubkey": ["90960896CCC0B2BE51ADDD62C76C0DA6C132EAB09A24292D9CD2B7EB05758E55A0485C25805341B3DCA009C7EE7A28619BA4AA47CF73D25CA011B0F1573693EE11446B1EF3122AEC8EB1C1C80A54EA0FA60E03BDD26281A45CB63135B4EC55E0F425F5A4D62E2C1FA208D5E6446436DCF5DDADA79A590983289BC75BF065EE67", "5"]\} \\                                              
+Welcome to Qubit Enterprises. Would you like your own time capsule? (Y/n) n \\
+Thank you, take care
+\end{lstlisting}
+
+\vspace{3mm}
+
+Each time we ask for it, the program will re-encrypt the flag. The public key (e,N) is outputted together with the ciphertext. Each iteration, p and q are randomly generated to construct N = p.q, but e=5 always stays the same
+
+\section{Solving the challenge}
+The RSA algorithm seems to be correctly implemented. Furthermore, you can try to break the prompt by not responding with Y(es) or n(o), but the program seems to be handling it correctly. However, there are some inherent vulnerabilities to textbook RSA, even when implemented correctly. 
+
+\vspace{3mm}
+
+For instance, when encrypting with low encryption exponents (e.g., e = 3) and small values of the m (i.e., m < n1/e), the result of me is strictly less than the modulus n. In this case, no modulus operation is needed and ciphertexts can be decrypted easily by taking the eth root of the ciphertext over the integers. Yet this CTF, the message is sufficiently long.
+
+\vspace{3mm}
+
+Another possible attack vector for textbook RSA is the so-called Coppersmith's attack. If the same clear-text message is sent to e or more recipients in an encrypted way, and the receivers share the same exponent e, but different p, q, and therefore n, then it is easy to decrypt the original clear-text message via the Chinese remainder theorem.
+
+\begin{equation}
+\begin{split}
+    C_1 \equiv m^e \quad (mod N_1) \\
+    C_2 \equiv m^e \quad (mod N_2) \\
+    ... \\
+    C_e \equiv m^e \quad (mod N_e)
+\end{split}
+\end{equation}
+
+\vspace{3mm}
+By using the CRT we can find:
+\begin{equation}
+ C \equiv m^e (mod N_1.N_2...N_e)
+\end{equation}
+
+\vspace{3mm}
+Ten, simply taking the e-th root:
+\begin{equation}
+ m \equiv \sqrt[e]{C} \quad (mod N_1.N_2...N_e)
+\end{equation}
+
+\end{document}
