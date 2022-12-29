@@ -1,7 +1,16 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage{listings}
 \usepackage{fullpage}
+\usepackage{enumitem,amssymb}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\usepackage{listings}
+
 \usepackage[table,xcdraw]{xcolor}
 \title{Web App Test}
 \author{Kasper}
@@ -9,7 +18,37 @@
 
 \begin{document}
 
-\maketitle
+\begin{table}[h]
+\def\arraystretch{1.8}
+\begin{tabular}{|llll|}
+\hline
+\multicolumn{4}{|c|}{\Large \textbf{Basic Penetration}}                                                                                         \\ \hline
+
+\multicolumn{2}{|p{0.4\textwidth}|}{Organization: TryHackMe}     &    \multicolumn{2}{|l|}{Type: online CTF}    \\ \hline
+\multicolumn{3}{|l|}{
+    \begin{minipage} [t] {0.07\textwidth} 
+Categories:
+    \end{minipage} 
+    \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}
+        \begin{todolist}
+            \item[\done] Network Security
+            \item Cryptography
+            \item Mobile Applications
+        \end{todolist}
+     \end{itemize} 
+    \end{minipage} 
+     \begin{minipage} [t] {0.3\textwidth} 
+      \begin{itemize}
+         \begin{todolist}
+            \item Reverse Engineering
+            \item[\done] Web Applications
+            \item Forensics
+            \end{todolist}
+        \end{itemize} 
+    \end{minipage} } & Difficulty: Easy \\ \hline \multicolumn{2}{|l|}{Name: Kasper Verhulst} & \multicolumn{2}{|l|}{\begin{tabular}[c]{@{}r@{}}Release date:23-07-2019\\ Completing date:29-12-2022\end{tabular}} \\ \hline
+\end{tabular}
+\end{table}
 
 \section*{Scanning \& Reconaissance}
 First, let us start scanning the machine to see which services are running. As usual, let's start by running an nmap command.
@@ -124,4 +163,3 @@ The private key is password protected, but the password can be cracked using Joh
 \end{lstlisting}
 
 \end{document}
-
