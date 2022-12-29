@@ -1,0 +1,127 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{fullpage}
+\usepackage[table,xcdraw]{xcolor}
+\title{Web App Test}
+\author{Kasper}
+\date{December 2022}
+
+\begin{document}
+
+\maketitle
+
+\section*{Scanning \& Reconaissance}
+First, let us start scanning the machine to see which services are running. As usual, let's start by running an nmap command.
+
+\begin{lstlisting}
+    nmap -A -sS -p1-1024 $BOX_IP -oN nmap.out
+\end{lstlisting}
+
+We find the following services running on the machine
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|}
+\hline
+\rowcolor[HTML]{9B9B9B} 
+\textbf{Port} & \textbf{Service} & \textbf{Version}                                             \\ \hline
+22/tcp open  & SSH            & OpenSSH 7.2p2 Ubuntu 4ubuntu2.4                                       \\ \hline
+80/tcp open  & HTTP    & Apache httpd 2.4.18                         \\ \hline
+139/tcp & NetBIOS & \\ \hline
+445/tcp & Samba & 4.3.11 \\ \hline
+\end{tabular}
+\end{table}
+
+The nmap also shows the netBIOS name of the host is BASIC2.
+
+\section*{Gaining Access}
+Let's start with examining the web server. We can access the web server on http://BOX\_IP. Nothing interesting is shown on the start page or in the source. Let's run gobuster to find other paths on the webserver 
+
+\begin{lstlisting}
+    gobuster dir -x html,php -u http://$BOX_IP -w 
+        /usr/share/dirbuster/wordlists/apache-user-enum-2.0.txt
+\end{lstlisting}
+
+We find the path /development that allows for some directory listing and we find two notes under this directory. In the note \textit{j.txt}, K warns J he has a poor password. In the note \textit{dev.txt}, both developers are talking about the programs they are installing: Apache httpd server, Apache struts and SMB. 
+
+\vspace{3mm}
+
+So we already know J has a weak password, but we need to find a username too. Brute-forcing username and password at the same time would simply take too much time. So let us scan the Samba server. There are many different ways to do so but here let us try with smbmap:
+
+\begin{lstlisting}
+    smbmap -H $BOX_IP -R
+\end{lstlisting}
+
+We see there is a file called \textit{staff.txt} available tu any user. Let's grab this file:
+
+\begin{lstlisting}
+    smbmap -H $BOX_IP --download ./Anonymous/staff.txt
+\end{lstlisting}
+In this file, we can find the usernames for both users: jan and kay. \newline
+Another way to have found these usernames would have been:
+
+\begin{lstlisting}
+    enum4linux $BOX_IP
+\end{lstlisting}
+
+Now since we know that Jan has a weak password, let us try to brute-force it using Hydra.
+
+\begin{lstlisting}
+    hydra -l jan -P /usr/share/wordlists/rockyou.txt ssh://$BOX_IP -t 4
+\end{lstlisting}
+We managed to brute-force our way into the machine using the password \textbf{armando}. We can now connect to the machine with
+
+\begin{lstlisting}
+    ssh jan@$BOX_IP 
+\end{lstlisting}
+
+\section*{Privilege Escalation}
+Now that we have access to the machine, we need to further extend our privileges. To start we can try a couple of things and take a look around what we can do. First let's try whether our user can simply use sudo
+
+\begin{lstlisting}
+    sudo -l 
+\end{lstlisting}
+
+Let's check which users there are
+
+\begin{lstlisting}
+   cat /etc/passwords
+\end{lstlisting}
+
+No luck so far, so let's use an automated privileged escalation script that can help us. Basically they check the machine for one of the following
+
+\begin{enumerate}
+\item Kernel exploits: exploiting vulnerabilities in the Linux Kernel we can sometimes escalate our privileges
+\item Programs running as root: specific service is running as root and you can make that service execute commands you can execute commands as root
+\item Installed software Third-party software that might be vulnerable
+\item Weak/reused/plaintext passwords
+\item Inside service
+\item Suid/guid misconfiguration: programs can be run with the privilege of the owner
+\item Abusing sudo-rights: access to some programs using sudo
+\item World writable scripts invoked by root: If you find a script that is owned by root but is writable by anyone you can add your own malicious code in that script
+\item Bad path configuration
+\item Cronjobs: With privileges running script that are editable for other users
+\item Unmounted filesystems here we are looking for any unmounted filesystems. If we find one we mount it and start the priv-esc process over again
+\end{enumerate}
+
+The LinEnum privilege escalation script finds a file \textit{/home/jay/pass.bak.}. Furthermore, we see that the binary \texttt{vim} has the SUID bit set. This means that the \texttt{vim} program is always ru with the privileges of the owner (root in this case) independently of who is calling the binary. Hence, even though the user \textit{jan} doesn't have read access to the file \textit{/home/jay/pass.bak.}, he can read the content using the \texttt{vim} program. We can find the final flag:
+
+\begin{lstlisting}
+   vim /home/jay/pass.bak
+\end{lstlisting}
+
+Alternatively, we could have found the private key from Kay. The file /home/user/jay/.ssh/id\_rsa was world readable. You can scp the private key to the local machine and use it to authenticate to the server as Kay. 
+
+\begin{lstlisting}
+   ssh kay@$BOX_IP -i id_rsa
+\end{lstlisting}
+
+
+The private key is password protected, but the password can be cracked using John the Ripper:
+
+\begin{lstlisting}
+   /usr/share/john/ssh2john.py id_rsa | john --wordlist /usr/share/wordlists/rockyou.txt
+\end{lstlisting}
+
+\end{document}
+
