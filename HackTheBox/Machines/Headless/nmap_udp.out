@@ -1,0 +1,9 @@
+# Nmap 7.94SVN scan initiated Fri Apr 12 23:46:41 2024 as: nmap -sU -p1-1023 -oN nmap_udp.out 10.10.11.8
+Nmap scan report for 10.10.11.8
+Host is up (0.050s latency).
+Not shown: 1021 closed udp ports (port-unreach)
+PORT    STATE         SERVICE
+68/udp  open|filtered dhcpc
+631/udp open|filtered ipp
+
+# Nmap done at Sat Apr 13 00:05:15 2024 -- 1 IP address (1 host up) scanned in 1114.88 seconds
