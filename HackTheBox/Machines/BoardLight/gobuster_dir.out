@@ -1,0 +1,9 @@
+/index.php           [32m (Status: 200)[0m [Size: 15949]
+/images              [36m (Status: 301)[0m [Size: 311][34m [--> http://10.10.11.11/images/][0m
+/.php                [33m (Status: 403)[0m [Size: 276]
+/contact.php         [32m (Status: 200)[0m [Size: 9426]
+/about.php           [32m (Status: 200)[0m [Size: 9100]
+/css                 [36m (Status: 301)[0m [Size: 308][34m [--> http://10.10.11.11/css/][0m
+/do.php              [32m (Status: 200)[0m [Size: 9209]
+/js                  [36m (Status: 301)[0m [Size: 307][34m [--> http://10.10.11.11/js/][0m
+/.php                [33m (Status: 403)[0m [Size: 276]
