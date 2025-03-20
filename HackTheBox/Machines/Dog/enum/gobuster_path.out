@@ -1,0 +1,12 @@
+/.html               [33m (Status: 403)[0m [Size: 276]
+/.php                [33m (Status: 403)[0m [Size: 276]
+/index.php           [32m (Status: 200)[0m [Size: 13332]
+/files               [36m (Status: 301)[0m [Size: 310][34m [--> http://10.10.11.58/files/][0m
+/themes              [36m (Status: 301)[0m [Size: 311][34m [--> http://10.10.11.58/themes/][0m
+/modules             [36m (Status: 301)[0m [Size: 312][34m [--> http://10.10.11.58/modules/][0m
+/sites               [36m (Status: 301)[0m [Size: 310][34m [--> http://10.10.11.58/sites/][0m
+/core                [36m (Status: 301)[0m [Size: 309][34m [--> http://10.10.11.58/core/][0m
+/settings.php        [32m (Status: 200)[0m [Size: 0]
+/layouts             [36m (Status: 301)[0m [Size: 312][34m [--> http://10.10.11.58/layouts/][0m
+/.php                [33m (Status: 403)[0m [Size: 276]
+/.html               [33m (Status: 403)[0m [Size: 276]
