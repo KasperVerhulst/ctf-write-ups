@@ -1,0 +1,137 @@
+# Nmap 7.94SVN scan initiated Thu May 22 21:02:07 2025 as: nmap -sS -A -p- -T4 -oN nmap.out 192.168.197.249
+Nmap scan report for 192.168.197.249
+Host is up (0.028s latency).
+Not shown: 65524 filtered tcp ports (no-response)
+PORT      STATE  SERVICE          VERSION
+21/tcp    open   ftp              vsftpd 3.0.3
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to 192.168.45.156
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 3
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+22/tcp    closed ssh
+111/tcp   closed rpcbind
+139/tcp   closed netbios-ssn
+443/tcp   closed https
+445/tcp   closed microsoft-ds
+2049/tcp  closed nfs
+10000/tcp closed snet-sensor-mgmt
+25022/tcp open   ssh              OpenSSH 8.6 (protocol 2.0)
+| ssh-hostkey: 
+|   256 68:c6:05:e8:dc:f2:9a:2a:78:9b:ee:a1:ae:f6:38:1a (ECDSA)
+|_  256 e9:89:cc:c2:17:14:f3:bc:62:21:06:4a:5e:71:80:ce (ED25519)
+33414/tcp open   unknown
+| fingerprint-strings: 
+|   GetRequest, HTTPOptions: 
+|     HTTP/1.1 404 NOT FOUND
+|     Server: Werkzeug/2.2.3 Python/3.9.13
+|     Date: Thu, 22 May 2025 19:03:41 GMT
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 207
+|     Connection: close
+|     <!doctype html>
+|     <html lang=en>
+|     <title>404 Not Found</title>
+|     <h1>Not Found</h1>
+|     <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+|   Help: 
+|     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+|     "http://www.w3.org/TR/html4/strict.dtd">
+|     <html>
+|     <head>
+|     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+|     <title>Error response</title>
+|     </head>
+|     <body>
+|     <h1>Error response</h1>
+|     <p>Error code: 400</p>
+|     <p>Message: Bad request syntax ('HELP').</p>
+|     <p>Error code explanation: HTTPStatus.BAD_REQUEST - Bad request syntax or unsupported method.</p>
+|     </body>
+|     </html>
+|   RTSPRequest: 
+|     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+|     "http://www.w3.org/TR/html4/strict.dtd">
+|     <html>
+|     <head>
+|     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+|     <title>Error response</title>
+|     </head>
+|     <body>
+|     <h1>Error response</h1>
+|     <p>Error code: 400</p>
+|     <p>Message: Bad request version ('RTSP/1.0').</p>
+|     <p>Error code explanation: HTTPStatus.BAD_REQUEST - Bad request syntax or unsupported method.</p>
+|     </body>
+|_    </html>
+40080/tcp open   http             Apache httpd 2.4.53 ((Fedora))
+|_http-server-header: Apache/2.4.53 (Fedora)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: My test page
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port33414-TCP:V=7.94SVN%I=7%D=5/22%Time=682F750D%P=x86_64-pc-linux-gnu%
+SF:r(GetRequest,184,"HTTP/1\.1\x20404\x20NOT\x20FOUND\r\nServer:\x20Werkze
+SF:ug/2\.2\.3\x20Python/3\.9\.13\r\nDate:\x20Thu,\x2022\x20May\x202025\x20
+SF:19:03:41\x20GMT\r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nCont
+SF:ent-Length:\x20207\r\nConnection:\x20close\r\n\r\n<!doctype\x20html>\n<
+SF:html\x20lang=en>\n<title>404\x20Not\x20Found</title>\n<h1>Not\x20Found<
+SF:/h1>\n<p>The\x20requested\x20URL\x20was\x20not\x20found\x20on\x20the\x2
+SF:0server\.\x20If\x20you\x20entered\x20the\x20URL\x20manually\x20please\x
+SF:20check\x20your\x20spelling\x20and\x20try\x20again\.</p>\n")%r(HTTPOpti
+SF:ons,184,"HTTP/1\.1\x20404\x20NOT\x20FOUND\r\nServer:\x20Werkzeug/2\.2\.
+SF:3\x20Python/3\.9\.13\r\nDate:\x20Thu,\x2022\x20May\x202025\x2019:03:41\
+SF:x20GMT\r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nContent-Lengt
+SF:h:\x20207\r\nConnection:\x20close\r\n\r\n<!doctype\x20html>\n<html\x20l
+SF:ang=en>\n<title>404\x20Not\x20Found</title>\n<h1>Not\x20Found</h1>\n<p>
+SF:The\x20requested\x20URL\x20was\x20not\x20found\x20on\x20the\x20server\.
+SF:\x20If\x20you\x20entered\x20the\x20URL\x20manually\x20please\x20check\x
+SF:20your\x20spelling\x20and\x20try\x20again\.</p>\n")%r(RTSPRequest,1F4,"
+SF:<!DOCTYPE\x20HTML\x20PUBLIC\x20\"-//W3C//DTD\x20HTML\x204\.01//EN\"\n\x
+SF:20\x20\x20\x20\x20\x20\x20\x20\"http://www\.w3\.org/TR/html4/strict\.dt
+SF:d\">\n<html>\n\x20\x20\x20\x20<head>\n\x20\x20\x20\x20\x20\x20\x20\x20<
+SF:meta\x20http-equiv=\"Content-Type\"\x20content=\"text/html;charset=utf-
+SF:8\">\n\x20\x20\x20\x20\x20\x20\x20\x20<title>Error\x20response</title>\
+SF:n\x20\x20\x20\x20</head>\n\x20\x20\x20\x20<body>\n\x20\x20\x20\x20\x20\
+SF:x20\x20\x20<h1>Error\x20response</h1>\n\x20\x20\x20\x20\x20\x20\x20\x20
+SF:<p>Error\x20code:\x20400</p>\n\x20\x20\x20\x20\x20\x20\x20\x20<p>Messag
+SF:e:\x20Bad\x20request\x20version\x20\('RTSP/1\.0'\)\.</p>\n\x20\x20\x20\
+SF:x20\x20\x20\x20\x20<p>Error\x20code\x20explanation:\x20HTTPStatus\.BAD_
+SF:REQUEST\x20-\x20Bad\x20request\x20syntax\x20or\x20unsupported\x20method
+SF:\.</p>\n\x20\x20\x20\x20</body>\n</html>\n")%r(Help,1EF,"<!DOCTYPE\x20H
+SF:TML\x20PUBLIC\x20\"-//W3C//DTD\x20HTML\x204\.01//EN\"\n\x20\x20\x20\x20
+SF:\x20\x20\x20\x20\"http://www\.w3\.org/TR/html4/strict\.dtd\">\n<html>\n
+SF:\x20\x20\x20\x20<head>\n\x20\x20\x20\x20\x20\x20\x20\x20<meta\x20http-e
+SF:quiv=\"Content-Type\"\x20content=\"text/html;charset=utf-8\">\n\x20\x20
+SF:\x20\x20\x20\x20\x20\x20<title>Error\x20response</title>\n\x20\x20\x20\
+SF:x20</head>\n\x20\x20\x20\x20<body>\n\x20\x20\x20\x20\x20\x20\x20\x20<h1
+SF:>Error\x20response</h1>\n\x20\x20\x20\x20\x20\x20\x20\x20<p>Error\x20co
+SF:de:\x20400</p>\n\x20\x20\x20\x20\x20\x20\x20\x20<p>Message:\x20Bad\x20r
+SF:equest\x20syntax\x20\('HELP'\)\.</p>\n\x20\x20\x20\x20\x20\x20\x20\x20<
+SF:p>Error\x20code\x20explanation:\x20HTTPStatus\.BAD_REQUEST\x20-\x20Bad\
+SF:x20request\x20syntax\x20or\x20unsupported\x20method\.</p>\n\x20\x20\x20
+SF:\x20</body>\n</html>\n");
+Aggressive OS guesses: Linux 5.0 - 5.4 (92%), Linux 5.0 (91%), Linux 4.15 - 5.8 (89%), Linux 5.0 - 5.5 (89%), HP P2000 G3 NAS device (89%), Infomir MAG-250 set-top box (88%), Netgear RAIDiator 4.2.21 (Linux 2.6.37) (88%), Linux 5.3 - 5.4 (88%), Linux 2.6.32 (88%), Linux 2.6.32 - 3.13 (88%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: OS: Unix
+
+TRACEROUTE (using port 22/tcp)
+HOP RTT      ADDRESS
+1   29.71 ms 192.168.45.1
+2   28.73 ms 192.168.45.254
+3   29.78 ms 192.168.251.1
+4   29.71 ms 192.168.197.249
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu May 22 21:05:38 2025 -- 1 IP address (1 host up) scanned in 211.52 seconds
